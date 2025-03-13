@@ -43,7 +43,7 @@ public class UsuarioService {
         usuarioRepository.delete(usuario);
     }
 
-    public UsuarioDTO buscarPorID(Long id){
+    public UsuarioDTO buscarUsuarioPorID(Long id){
         return new UsuarioDTO(usuarioRepository.findById(id).get());
     }
 }
