@@ -1,6 +1,7 @@
 package br.com.biblioteca.entities;
 
 import jakarta.persistence.*;
+import br.com.biblioteca.dto.LivroDTO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -31,10 +32,22 @@ public class LivroEntity {
     @Column(nullable = false)
     private boolean emprestado;
 
-    public LivroEntity() {
+    public LivroEntity(LivroDTO livroDTO) {
+        this.id = livroDTO.id();
+        this.titulo = livroDTO.titulo();
+        this.nomeAutor = livroDTO.nomeAutor();
+        this.anoPublicacao = livroDTO.anoPublicacao();
+        this.quantidadeExemplares = livroDTO.quantidadeExemplares();
+        this.genero = livroDTO.genero();
+        this.emprestado = false;
     }
 
-    public LivroEntity(Long id, String titulo, String nomeAutor, int anoPublicacao, int quantidadeExemplares, String genero, boolean emprestado) {
+    public LivroEntity() {
+        this.emprestado = false;
+    }
+
+    public LivroEntity(Long id, String titulo, String nomeAutor, int anoPublicacao, int quantidadeExemplares,
+            String genero, boolean emprestado) {
         this.id = id;
         this.titulo = titulo;
         this.nomeAutor = nomeAutor;
