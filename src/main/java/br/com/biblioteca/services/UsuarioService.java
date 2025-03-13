@@ -17,9 +17,6 @@ public class UsuarioService {
     public List<UsuarioDTO> listarTodosUsuarios(){
         List<UsuarioEntity> usuarios = usuarioRepository.findAll();
         return usuarios.stream().map(UsuarioDTO::new).toList(); 
-        //stream() é um método que transforma a lista em um fluxo de dados
-        //map() é um método que transforma cada elemento do fluxo de dados
-        //toList() é um método que transforma o fluxo de dados em uma lista
     }
 
     public List<UsuarioDTO> buscarUsuarioPorNome(String nome){
