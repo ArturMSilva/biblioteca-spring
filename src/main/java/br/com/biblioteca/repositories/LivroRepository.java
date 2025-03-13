@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import br.com.biblioteca.entities.LivroEntity;
 
 public interface LivroRepository extends JpaRepository<LivroEntity, Long> {
-    List<LivroEntity> findByNome(String nome);
+    List<LivroEntity> findByTitulo(String titulo);
 }
