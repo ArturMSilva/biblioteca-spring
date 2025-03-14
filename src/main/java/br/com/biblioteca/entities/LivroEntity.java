@@ -21,16 +21,16 @@ public class LivroEntity {
     private String nomeAutor;
 
     @Column(nullable = false)
-    private int anoPublicacao;
+    private Integer anoPublicacao;
 
     @Column(nullable = false)
-    private int quantidadeExemplares;
+    private Integer quantidadeExemplares;
 
     @Column(nullable = false)
     private String genero;
 
-    @Column(nullable = false)
-    private boolean emprestado;
+    @Column
+    private Boolean emprestado;
 
     public LivroEntity(LivroDTO livroDTO) {
         this.id = livroDTO.id();
@@ -39,21 +39,21 @@ public class LivroEntity {
         this.anoPublicacao = livroDTO.anoPublicacao();
         this.quantidadeExemplares = livroDTO.quantidadeExemplares();
         this.genero = livroDTO.genero();
-        this.emprestado = false;
+        this.emprestado = livroDTO.emprestado() != null ? livroDTO.emprestado() : false;
     }
 
     public LivroEntity() {
         this.emprestado = false;
     }
 
-    public LivroEntity(Long id, String titulo, String nomeAutor, int anoPublicacao, int quantidadeExemplares,
-            String genero, boolean emprestado) {
+    public LivroEntity(Long id, String titulo, String nomeAutor, Integer anoPublicacao, Integer quantidadeExemplares,
+            String genero, Boolean emprestado) {
         this.id = id;
         this.titulo = titulo;
         this.nomeAutor = nomeAutor;
         this.anoPublicacao = anoPublicacao;
         this.quantidadeExemplares = quantidadeExemplares;
         this.genero = genero;
-        this.emprestado = emprestado;
+        this.emprestado = false;
     }
 }
