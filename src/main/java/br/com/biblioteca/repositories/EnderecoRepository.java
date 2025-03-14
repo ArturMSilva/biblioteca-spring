@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import br.com.biblioteca.entities.EnderecoEntity;
 
 public interface EnderecoRepository extends JpaRepository<EnderecoEntity, Long> {
-    List<EnderecoEntity> findByEstado(String estado);
+    List<EnderecoEntity> findByCep(String cep);
 }
