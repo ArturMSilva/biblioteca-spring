@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,12 +42,12 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public void adicionarUsuario(@RequestBody UsuarioDTO usuario) {
+    public void adicionarUsuario(@Validated @RequestBody UsuarioDTO usuario) {
         usuarioService.adicionarUsuario(usuario);
     }
 
     @PutMapping
-    public UsuarioDTO atualizarUsuario(@RequestBody UsuarioDTO usuario) {
+    public UsuarioDTO atualizarUsuario(@Validated @RequestBody UsuarioDTO usuario) {
         return usuarioService.atualizarUsuario(usuario);
     }
 
