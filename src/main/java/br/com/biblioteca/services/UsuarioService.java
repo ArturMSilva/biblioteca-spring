@@ -14,6 +14,9 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private EmailService emailService;
+
     public List<UsuarioDTO> listarTodosUsuarios(){
         List<UsuarioEntity> usuarios = usuarioRepository.findAll();
         return usuarios.stream().map(UsuarioDTO::new).toList(); 
@@ -30,6 +33,8 @@ public class UsuarioService {
         }
         UsuarioEntity usuarioEntity = new UsuarioEntity(usuario);
         usuarioRepository.save(usuarioEntity);
+
+        emailService.enviarEmail(usuario.email(), "Bem-vindo", "Olá, " + usuario.nome() + "! Seja bem-vindo à nossa biblioteca!");
     }
 
     public UsuarioDTO atualizarUsuario(UsuarioDTO usuario){
