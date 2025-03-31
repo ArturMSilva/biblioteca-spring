@@ -28,34 +28,47 @@ public class LivroService {
         return livros.stream().map(LivroDTO::new).toList();
     }
 
-    public void adicionarLivro(LivroDTO livro){
+    public LivroDTO buscarLivroPorEmprestimo(Long idEmprestimo) {
+        LivroEntity livro = livroRepository.findLivroByEmprestimoId(idEmprestimo);
+        return new LivroDTO(livro);
+    }
+
+    public void adicionarLivro(LivroDTO livro) {
         LivroEntity livroEntity = new LivroEntity(livro);
         livroRepository.save(livroEntity);
     }
 
-    public LivroDTO atualizarLivro(LivroDTO livro){
-        LivroEntity livroEntity = new LivroEntity(livro);
-        return new LivroDTO(livroRepository.save(livroEntity));
+    public LivroDTO atualizarLivro(Long id, LivroDTO livroAtualizado) {
+        LivroEntity livro = livroRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Livro com ID " + id + " não encontrado"));
+    
+        livro.setTitulo(livroAtualizado.titulo());
+        livro.setNomeAutor(livroAtualizado.nomeAutor());
+        livro.setAnoPublicacao(livroAtualizado.anoPublicacao());
+        livro.setQuantidadeExemplares(livroAtualizado.quantidadeExemplares());
+        livro.setGenero(livroAtualizado.genero());
+    
+        return new LivroDTO(livroRepository.save(livro));
     }
 
-    public void deletarLivro(Long id){
+    public void deletarLivro(Long id) {
         LivroEntity livro = livroRepository.findById(id).get();
         livroRepository.delete(livro);
     }
 
     public void realizarEmprestimoLivro(Long id) {
         LivroEntity livro = livroRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Livro não encontrado"));
-        
+                .orElseThrow(() -> new RuntimeException("Livro não encontrado"));
+
         livro.setEmprestado(true);
-        livroRepository.save(livro); 
+        livroRepository.save(livro);
     }
 
     public void devolverLivro(Long id) {
         LivroEntity livro = livroRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Livro não encontrado"));
-        
+                .orElseThrow(() -> new RuntimeException("Livro não encontrado"));
+
         livro.setEmprestado(false);
-        livroRepository.save(livro); 
+        livroRepository.save(livro);
     }
 }
