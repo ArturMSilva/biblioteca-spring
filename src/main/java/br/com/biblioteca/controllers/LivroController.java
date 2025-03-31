@@ -30,15 +30,21 @@ public class LivroController {
     public List<LivroDTO> listarTodosLivros() {
         return livroService.listarTodosLivros();
     }
-    
+
     @GetMapping("/{id}")
     public LivroDTO buscarLivroPorId(@PathVariable Long id) {
         return livroService.buscarLivroPorId(id);
     }
-    
-    @GetMapping("/buscar-livro-titulo")
-    public List<LivroDTO> buscarLivroPorTitulo(@RequestParam String titulo) {
-        return livroService.buscarLivroPorTitulo(titulo);
+
+    @GetMapping("/buscar")
+    public Object buscarLivro(@RequestParam(required = false) String titulo,
+            @RequestParam(required = false) Long idEmprestimo) {
+        if (titulo != null) {
+            return livroService.buscarLivroPorTitulo(titulo);
+        } else if (idEmprestimo != null) {
+            return livroService.buscarLivroPorEmprestimo(idEmprestimo);
+        }
+        return ResponseEntity.badRequest().body("Parâmetro inválido. Informe 'titulo' ou 'id'.");
     }
 
     @PostMapping
@@ -46,9 +52,9 @@ public class LivroController {
         livroService.adicionarLivro(livro);
     }
 
-    @PutMapping
-    public LivroDTO atualizarLivro(@Validated @RequestBody LivroDTO livro) {
-        return livroService.atualizarLivro(livro);
+    @PutMapping("/{id}")
+    public LivroDTO atualizarLivro(@PathVariable Long id, @Validated @RequestBody LivroDTO livroAtualizado) {
+        return livroService.atualizarLivro(id, livroAtualizado);
     }
 
     @DeleteMapping("/{id}")
