@@ -36,9 +36,15 @@ public class UsuarioController {
         return usuarioService.buscarUsuarioPorID(id);
     }
 
-    @GetMapping("/buscar-usuario-nome")
-    public List<UsuarioDTO> buscarUsuarioPorNome(@RequestParam String nome) {
-        return usuarioService.buscarUsuarioPorNome(nome);
+    @GetMapping("/buscar")
+    public List<UsuarioDTO> buscarUsuario(@RequestParam(required = false) String nome,
+            @RequestParam(required = false) Long idEmprestimo) {
+        if (nome != null) {
+            return usuarioService.buscarUsuarioPorNome(nome);
+        } else if (idEmprestimo != null) {
+            return List.of(usuarioService.buscarUsuarioPorEmprestimo(idEmprestimo));
+        }
+        return List.of();
     }
 
     @PostMapping
@@ -46,9 +52,9 @@ public class UsuarioController {
         usuarioService.adicionarUsuario(usuario);
     }
 
-    @PutMapping
-    public UsuarioDTO atualizarUsuario(@Validated @RequestBody UsuarioDTO usuario) {
-        return usuarioService.atualizarUsuario(usuario);
+    @PutMapping("/{id}")
+    public UsuarioDTO atualizarUsuario(@PathVariable Long id) {
+        return usuarioService.atualizarUsuario(id);
     }
 
     @DeleteMapping("/{id}")
