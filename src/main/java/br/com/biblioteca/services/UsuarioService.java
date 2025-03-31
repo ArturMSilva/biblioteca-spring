@@ -47,8 +47,13 @@ public class UsuarioService {
                 "Olá, " + usuario.nome() + "! Seja bem-vindo à nossa biblioteca!");
     }
 
-    public UsuarioDTO atualizarUsuario(Long id) {
-        UsuarioEntity usuario = usuarioRepository.findById(id).get();
+    public UsuarioDTO atualizarUsuario(Long id, UsuarioDTO usuarioAtualizado) {
+        UsuarioEntity usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário com ID " + id + " não encontrado"));
+    
+        usuario.setNome(usuarioAtualizado.nome());
+        usuario.setEmail(usuarioAtualizado.email());
+    
         return new UsuarioDTO(usuarioRepository.save(usuario));
     }
 
