@@ -53,8 +53,8 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public UsuarioDTO atualizarUsuario(@PathVariable Long id) {
-        return usuarioService.atualizarUsuario(id);
+    public UsuarioDTO atualizarUsuario(@PathVariable Long id, @Validated @RequestBody UsuarioDTO usuarioAtualizado) {
+        return usuarioService.atualizarUsuario(id, usuarioAtualizado);
     }
 
     @DeleteMapping("/{id}")
