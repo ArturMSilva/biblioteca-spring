@@ -17,40 +17,43 @@ public class UsuarioService {
     @Autowired
     private EmailService emailService;
 
-    public List<UsuarioDTO> listarTodosUsuarios(){
+    public List<UsuarioDTO> listarTodosUsuarios() {
         List<UsuarioEntity> usuarios = usuarioRepository.findAll();
-        return usuarios.stream().map(UsuarioDTO::new).toList(); 
+        return usuarios.stream().map(UsuarioDTO::new).toList();
     }
 
-    public List<UsuarioDTO> buscarUsuarioPorNome(String nome){
+    public UsuarioDTO buscarUsuarioPorID(Long id) {
+        return new UsuarioDTO(usuarioRepository.findById(id).get());
+    }
+
+    public List<UsuarioDTO> buscarUsuarioPorNome(String nome) {
         List<UsuarioEntity> usuarios = usuarioRepository.findByNome(nome);
         return usuarios.stream().map(UsuarioDTO::new).toList();
     }
 
-    public void adicionarUsuario(UsuarioDTO usuario){
+    public UsuarioDTO buscarUsuarioPorEmprestimo(Long idEmprestimo) {
+        UsuarioEntity usuario = usuarioRepository.findUsuarioByEmprestimoId(idEmprestimo);
+        return new UsuarioDTO(usuario);
+    }
+
+    public void adicionarUsuario(UsuarioDTO usuario) {
         if (usuario.cpf() == null || usuario.cpf().isEmpty()) {
             throw new IllegalArgumentException("CPF não pode ser nulo ou vazio");
         }
         UsuarioEntity usuarioEntity = new UsuarioEntity(usuario);
         usuarioRepository.save(usuarioEntity);
 
-        emailService.enviarEmail(usuario.email(), "Bem-vindo", "Olá, " + usuario.nome() + "! Seja bem-vindo à nossa biblioteca!");
+        emailService.enviarEmail(usuario.email(), "Bem-vindo",
+                "Olá, " + usuario.nome() + "! Seja bem-vindo à nossa biblioteca!");
     }
 
-    public UsuarioDTO atualizarUsuario(UsuarioDTO usuario){
-        if (usuario.cpf() == null || usuario.cpf().isEmpty()) {
-            throw new IllegalArgumentException("CPF não pode ser nulo ou vazio");
-        }
-        UsuarioEntity usuarioEntity = new UsuarioEntity(usuario);
-        return new UsuarioDTO(usuarioRepository.save(usuarioEntity));
+    public UsuarioDTO atualizarUsuario(Long id) {
+        UsuarioEntity usuario = usuarioRepository.findById(id).get();
+        return new UsuarioDTO(usuarioRepository.save(usuario));
     }
 
-    public void deletarUsuario(Long id){
+    public void deletarUsuario(Long id) {
         UsuarioEntity usuario = usuarioRepository.findById(id).get();
         usuarioRepository.delete(usuario);
-    }
-
-    public UsuarioDTO buscarUsuarioPorID(Long id){
-        return new UsuarioDTO(usuarioRepository.findById(id).get());
     }
 }
