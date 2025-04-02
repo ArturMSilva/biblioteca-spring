@@ -12,9 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -35,25 +35,34 @@ public class EmprestimoController {
         return emprestimoService.buscarEmprestimoPorId(id);
     }
 
-    @GetMapping("/buscar-emprestimo-por-usuario/{id}")
-    public List<EmprestimoDTO> buscarEmprestimoPorUsuario(@PathVariable Long id) {
-        return emprestimoService.buscarEmprestimoPorUsuarioId(id);
-    }
-
-    @GetMapping("/buscar-emprestimo-por-livro/{id}")
-    public List<EmprestimoDTO> buscarEmprestimoPorLivro(@PathVariable Long id) {
-        return emprestimoService.buscarEmprestimoPorLivroId(id);
-    }
-
     @PostMapping
     public ResponseEntity<Void> adicionarEmprestimo(@Validated @RequestBody EmprestimoDTO emprestimo) {
         emprestimoService.adicionarEmprestimo(emprestimo);
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping
-    public EmprestimoDTO atualizarEmprestimo(@Validated @RequestBody EmprestimoDTO emprestimo) {
-        return emprestimoService.atualizarEmprestimo(emprestimo);
+    @PatchMapping("/{id}/ativar")
+    public ResponseEntity<EmprestimoDTO> ativarEmprestimoPendente(@PathVariable Long id) {
+        EmprestimoDTO emprestimoAtualizado = emprestimoService.ativarEmprestimoPendente(id);
+        return ResponseEntity.ok(emprestimoAtualizado);
+    }
+
+    @PatchMapping("/{id}/renovar")
+    public ResponseEntity<EmprestimoDTO> renovarEmprestimo(@PathVariable Long id, @RequestBody int diasAdicionais) {
+        EmprestimoDTO emprestimoAtualizado = emprestimoService.renovarEmprestimo(id, diasAdicionais);
+        return ResponseEntity.ok(emprestimoAtualizado);
+    }
+
+    @PatchMapping("/{id}/encerrar")
+    public ResponseEntity<EmprestimoDTO> encerrarEmprestimo(@PathVariable Long id) {
+        EmprestimoDTO emprestimoAtualizado = emprestimoService.encerrarEmprestimo(id);
+        return ResponseEntity.ok(emprestimoAtualizado);
+    }
+
+    @PatchMapping("/{id}/cancelar")
+    public ResponseEntity<EmprestimoDTO> cancelarEmprestimo(@PathVariable Long id) {
+        EmprestimoDTO emprestimoAtualizado = emprestimoService.cancelarEmprestimo(id);
+        return ResponseEntity.ok(emprestimoAtualizado);
     }
 
     @DeleteMapping("/{id}")
