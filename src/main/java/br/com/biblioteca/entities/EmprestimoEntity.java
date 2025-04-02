@@ -31,8 +31,17 @@ public class EmprestimoEntity {
     @Column(nullable = false)
     private LocalDate dataDevolucao;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Boolean devolvido;
+    private StatusEmprestimo status;
+
+    public enum StatusEmprestimo {
+        PENDENTE,
+        EM_ANDAMENTO,
+        ATRASADO,
+        FINALIZADO,
+        CANCELADO
+    }
 
     public EmprestimoEntity(EmprestimoDTO emprestimoDTO) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -41,19 +50,19 @@ public class EmprestimoEntity {
         this.livro = (emprestimoDTO.livro() != null) ? new LivroEntity(emprestimoDTO.livro()) : null;
         this.dataEmprestimo = LocalDate.parse(emprestimoDTO.dataEmprestimo(), formatter);
         this.dataDevolucao = LocalDate.parse(emprestimoDTO.dataDevolucao(), formatter);
-        this.devolvido = emprestimoDTO.devolvido();
+        this.status = StatusEmprestimo.PENDENTE; 
     }
 
     public EmprestimoEntity() {
     }
 
     public EmprestimoEntity(Long id, UsuarioEntity usuario, LivroEntity livro, LocalDate dataEmprestimo,
-            LocalDate dataDevolucao, Boolean devolvido) {
+            LocalDate dataDevolucao, StatusEmprestimo status) {
         this.id = id;
         this.usuario = usuario;
         this.livro = livro;
         this.dataEmprestimo = dataEmprestimo;
         this.dataDevolucao = dataDevolucao;
-        this.devolvido = devolvido;
+        this.status = status;
     }
 }
