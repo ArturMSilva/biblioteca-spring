@@ -4,26 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.biblioteca.repositories.EmprestimoRepository;
-import br.com.biblioteca.repositories.LivroRepository;
-import br.com.biblioteca.repositories.UsuarioRepository;
 
 import java.util.List;
 import br.com.biblioteca.dto.EmprestimoDTO;
 import br.com.biblioteca.entities.EmprestimoEntity;
 import br.com.biblioteca.entities.LivroEntity;
-import br.com.biblioteca.entities.UsuarioEntity;
 
 @Service
 public class EmprestimoService {
 
     @Autowired
     private EmprestimoRepository emprestimoRepository;
-
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
-    @Autowired
-    private LivroRepository livroRepository;
 
     public List<EmprestimoDTO> buscarTodosEmprestimos() {
         List<EmprestimoEntity> emprestimos = emprestimoRepository.findAll();
@@ -34,30 +25,75 @@ public class EmprestimoService {
         return new EmprestimoDTO(emprestimoRepository.findById(id).get());
     }
 
-    public List<EmprestimoDTO> buscarEmprestimoPorUsuarioId(Long id) {
-        UsuarioEntity usuario = usuarioRepository.findById(id).get();
-        List<EmprestimoEntity> emprestimos = emprestimoRepository.findByUsuario(usuario);
-        return emprestimos.stream().map(EmprestimoDTO::new).toList();
-    }
-
-    public List<EmprestimoDTO> buscarEmprestimoPorLivroId(Long id) {
-        LivroEntity livro = livroRepository.findById(id).get();
-        List<EmprestimoEntity> emprestimos = emprestimoRepository.findByLivro(livro);
-        return emprestimos.stream().map(EmprestimoDTO::new).toList();
-    }
-
     public EmprestimoDTO adicionarEmprestimo(EmprestimoDTO emprestimoDTO) {
         EmprestimoEntity emprestimo = new EmprestimoEntity(emprestimoDTO);
-        emprestimo = emprestimoRepository.save(emprestimo);
 
+        if (!livroEstaDisponivel(emprestimo.getLivro())) {
+            emprestimo.setStatus(EmprestimoEntity.StatusEmprestimo.PENDENTE);
+        } else {
+            emprestimo.setStatus(EmprestimoEntity.StatusEmprestimo.EM_ANDAMENTO);
+        }
+
+        emprestimo = emprestimoRepository.save(emprestimo);
         return new EmprestimoDTO(emprestimo);
     }
 
-    public EmprestimoDTO atualizarEmprestimo(EmprestimoDTO emprestimoDTO) {
-        EmprestimoEntity emprestimo = new EmprestimoEntity(emprestimoDTO);
-        emprestimo = emprestimoRepository.save(emprestimo);
+    public EmprestimoDTO ativarEmprestimoPendente(Long id) {
+        EmprestimoEntity emprestimo = emprestimoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Empréstimo com ID " + id + " não encontrado"));
 
-        return new EmprestimoDTO(emprestimo);
+        if (emprestimo.getStatus() != EmprestimoEntity.StatusEmprestimo.PENDENTE) {
+            throw new IllegalStateException("Somente empréstimos pendentes podem ser ativados.");
+        }
+
+        emprestimo.setStatus(EmprestimoEntity.StatusEmprestimo.EM_ANDAMENTO);
+        return new EmprestimoDTO(emprestimoRepository.save(emprestimo));
+    }
+
+    private boolean livroEstaDisponivel(LivroEntity livro) {
+        return !emprestimoRepository.existsByLivroAndStatus(livro, EmprestimoEntity.StatusEmprestimo.EM_ANDAMENTO);
+    }
+
+    public EmprestimoDTO renovarEmprestimo(Long id, int diasAdicionais) {
+        EmprestimoEntity emprestimo = emprestimoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Empréstimo com ID " + id + " não encontrado"));
+
+        if (emprestimo.getStatus() == EmprestimoEntity.StatusEmprestimo.FINALIZADO
+                || emprestimo.getStatus() == EmprestimoEntity.StatusEmprestimo.CANCELADO) {
+            throw new IllegalStateException("Não é possível renovar um empréstimo finalizado ou cancelado.");
+        }
+
+        emprestimo.setDataDevolucao(emprestimo.getDataDevolucao().plusDays(diasAdicionais));
+
+        if (emprestimo.getStatus() != EmprestimoEntity.StatusEmprestimo.EM_ANDAMENTO) {
+            emprestimo.setStatus(EmprestimoEntity.StatusEmprestimo.EM_ANDAMENTO);
+        }
+
+        return new EmprestimoDTO(emprestimoRepository.save(emprestimo));
+    }
+
+    public EmprestimoDTO encerrarEmprestimo(Long id) {
+        EmprestimoEntity emprestimo = emprestimoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Empréstimo com ID " + id + " não encontrado"));
+
+        if (emprestimo.getStatus() == EmprestimoEntity.StatusEmprestimo.FINALIZADO) {
+            throw new IllegalStateException("O empréstimo já está finalizado.");
+        }
+
+        emprestimo.setStatus(EmprestimoEntity.StatusEmprestimo.FINALIZADO);
+        return new EmprestimoDTO(emprestimoRepository.save(emprestimo));
+    }
+
+    public EmprestimoDTO cancelarEmprestimo(Long id) {
+        EmprestimoEntity emprestimo = emprestimoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Empréstimo com ID " + id + " não encontrado"));
+
+        if (emprestimo.getStatus() == EmprestimoEntity.StatusEmprestimo.FINALIZADO) {
+            throw new IllegalStateException("Não é possível cancelar um empréstimo já finalizado.");
+        }
+
+        emprestimo.setStatus(EmprestimoEntity.StatusEmprestimo.CANCELADO);
+        return new EmprestimoDTO(emprestimoRepository.save(emprestimo));
     }
 
     public void deletarEmprestimo(Long id) {
