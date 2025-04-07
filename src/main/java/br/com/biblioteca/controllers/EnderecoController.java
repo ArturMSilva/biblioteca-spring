@@ -36,7 +36,7 @@ public class EnderecoController {
         return enderecoService.buscarEnderecoPorId(id);
     }
 
-    @GetMapping("/buscar-endereco-cep")
+    @GetMapping("/buscar")
     public List<EnderecoDTO> buscarEnderecoPorCEP(@RequestParam String cep) {
         return enderecoService.buscarEnderecoPorCEP(cep);
     }
@@ -46,9 +46,10 @@ public class EnderecoController {
         enderecoService.adicionarEndereco(endereco);
     }
 
-    @PutMapping
-    public EnderecoDTO atualizarEndereco(@Validated @RequestBody EnderecoDTO endereco) {
-        return enderecoService.atualizarEndereco(endereco);
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> atualizarEndereco(@PathVariable Long id, @Validated @RequestBody EnderecoDTO endereco) {
+        enderecoService.atualizarEndereco(id, endereco);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
