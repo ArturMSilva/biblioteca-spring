@@ -20,7 +20,9 @@ public class LivroService {
     }
 
     public LivroDTO buscarLivroPorId(Long id) {
-        return new LivroDTO(livroRepository.findById(id).get());
+        LivroEntity livro = livroRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Livro com ID " + id + " não encontrado"));
+        return new LivroDTO(livro);
     }
 
     public List<LivroDTO> buscarLivroPorTitulo(String titulo) {
@@ -33,21 +35,35 @@ public class LivroService {
         return new LivroDTO(livro);
     }
 
-    public void adicionarLivro(LivroDTO livro) {
-        LivroEntity livroEntity = new LivroEntity(livro);
-        livroRepository.save(livroEntity);
+    public LivroDTO adicionarLivro(LivroDTO livroDTO) {
+        LivroEntity livro = new LivroEntity(livroDTO);
+        livro.setQuantidadeDisponivel(livro.getQuantidadeExemplares());
+        return new LivroDTO(livroRepository.save(livro));
     }
 
     public LivroDTO atualizarLivro(Long id, LivroDTO livroAtualizado) {
         LivroEntity livro = livroRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Livro com ID " + id + " não encontrado"));
-    
+
         livro.setTitulo(livroAtualizado.titulo());
         livro.setNomeAutor(livroAtualizado.nomeAutor());
         livro.setAnoPublicacao(livroAtualizado.anoPublicacao());
-        livro.setQuantidadeExemplares(livroAtualizado.quantidadeExemplares());
         livro.setGenero(livroAtualizado.genero());
-    
+
+        return new LivroDTO(livroRepository.save(livro));
+    }
+
+    public LivroDTO adicionarExemplar(Long id, int quantidade) {
+        LivroEntity livro = livroRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Livro com ID " + id + " não encontrado"));
+
+        if (quantidade <= 0) {
+            throw new IllegalArgumentException("A quantidade de exemplares a ser adicionada deve ser maior que zero.");
+        }
+
+        livro.setQuantidadeExemplares(livro.getQuantidadeExemplares() + quantidade);
+        livro.setQuantidadeDisponivel(livro.getQuantidadeDisponivel() + quantidade);
+
         return new LivroDTO(livroRepository.save(livro));
     }
 
