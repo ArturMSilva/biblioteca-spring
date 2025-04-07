@@ -8,7 +8,6 @@ import br.com.biblioteca.repositories.LivroRepository;
 import br.com.biblioteca.repositories.UsuarioRepository;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import br.com.biblioteca.dto.EmprestimoDTO;
 import br.com.biblioteca.entities.EmprestimoEntity;
