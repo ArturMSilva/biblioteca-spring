@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.biblioteca.repositories.EmprestimoRepository;
+import br.com.biblioteca.repositories.LivroRepository;
 
 import java.util.List;
 import br.com.biblioteca.dto.EmprestimoDTO;
@@ -16,6 +17,9 @@ public class EmprestimoService {
     @Autowired
     private EmprestimoRepository emprestimoRepository;
 
+    @Autowired
+    private LivroRepository livroRepository;
+
     public List<EmprestimoDTO> buscarTodosEmprestimos() {
         List<EmprestimoEntity> emprestimos = emprestimoRepository.findAll();
         return emprestimos.stream().map(EmprestimoDTO::new).toList();
@@ -27,14 +31,18 @@ public class EmprestimoService {
 
     public EmprestimoDTO adicionarEmprestimo(EmprestimoDTO emprestimoDTO) {
         EmprestimoEntity emprestimo = new EmprestimoEntity(emprestimoDTO);
-
-        if (!livroEstaDisponivel(emprestimo.getLivro())) {
-            emprestimo.setStatus(EmprestimoEntity.StatusEmprestimo.PENDENTE);
-        } else {
+        LivroEntity livro = emprestimo.getLivro();
+    
+        if (livro.getQuantidadeDisponivel() > 0) {
             emprestimo.setStatus(EmprestimoEntity.StatusEmprestimo.EM_ANDAMENTO);
+            livro.setQuantidadeDisponivel(livro.getQuantidadeDisponivel() - 1); // Diminui a quantidade disponível
+        } else {
+            emprestimo.setStatus(EmprestimoEntity.StatusEmprestimo.PENDENTE);
         }
-
+    
         emprestimo = emprestimoRepository.save(emprestimo);
+        livroRepository.save(livro); 
+    
         return new EmprestimoDTO(emprestimo);
     }
 
@@ -48,10 +56,6 @@ public class EmprestimoService {
 
         emprestimo.setStatus(EmprestimoEntity.StatusEmprestimo.EM_ANDAMENTO);
         return new EmprestimoDTO(emprestimoRepository.save(emprestimo));
-    }
-
-    private boolean livroEstaDisponivel(LivroEntity livro) {
-        return !emprestimoRepository.existsByLivroAndStatus(livro, EmprestimoEntity.StatusEmprestimo.EM_ANDAMENTO);
     }
 
     public EmprestimoDTO renovarEmprestimo(Long id, int diasAdicionais) {
