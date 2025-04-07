@@ -39,9 +39,18 @@ public class EnderecoService {
         enderecoRepository.save(enderecoEntity);
     }
 
-    public EnderecoDTO atualizarEndereco(EnderecoDTO endereco) {
-        EnderecoEntity enderecoEntity = new EnderecoEntity(endereco);
-        return new EnderecoDTO(enderecoRepository.save(enderecoEntity));
+    public EnderecoDTO atualizarEndereco(Long id, EnderecoDTO enderecoAtualizado) {
+        EnderecoEntity endereco = enderecoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Endereco com ID " + id + " não encontrado"));
+
+        endereco.setCep(enderecoAtualizado.cep());
+        endereco.setNumero(enderecoAtualizado.numero());
+        endereco.setBairro(enderecoAtualizado.bairro());
+        endereco.setCidade(enderecoAtualizado.cidade());
+        endereco.setEstado(enderecoAtualizado.estado());
+        endereco.setRua(enderecoAtualizado.rua());
+
+        return new EnderecoDTO(enderecoRepository.save(endereco));
     }
 
     public void deletarEndereco(Long id) {
