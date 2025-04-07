@@ -27,6 +27,9 @@ public class LivroEntity {
     private Integer quantidadeExemplares;
 
     @Column(nullable = false)
+    private Integer quantidadeDisponivel;
+
+    @Column(nullable = false)
     private String genero;
 
     @Column
@@ -38,6 +41,7 @@ public class LivroEntity {
         this.nomeAutor = livroDTO.nomeAutor();
         this.anoPublicacao = livroDTO.anoPublicacao();
         this.quantidadeExemplares = livroDTO.quantidadeExemplares();
+        this.quantidadeDisponivel = livroDTO.quantidadeExemplares();
         this.genero = livroDTO.genero();
         this.emprestado = livroDTO.emprestado() != null ? livroDTO.emprestado() : false;
     }
