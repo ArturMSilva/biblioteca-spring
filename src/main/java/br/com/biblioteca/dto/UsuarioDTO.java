@@ -10,6 +10,5 @@ public record UsuarioDTO(Long id, String nome, String email, String cpf, Enderec
                 usuarioEntity.getEmail(),
                 usuarioEntity.getCpf(),
                 (usuarioEntity.getEndereco() != null) ? new EnderecoDTO(usuarioEntity.getEndereco()) : null);
-                // Garantir que o endereco não seja nulo antes de criar uma nova instância
     }
 }
