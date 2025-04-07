@@ -35,21 +35,20 @@ public class LivroEntity {
     @Column
     private Boolean emprestado;
 
+    public LivroEntity() {
+    }
+
     public LivroEntity(LivroDTO livroDTO) {
         this.id = livroDTO.id();
         this.titulo = livroDTO.titulo();
         this.nomeAutor = livroDTO.nomeAutor();
         this.anoPublicacao = livroDTO.anoPublicacao();
         this.quantidadeExemplares = livroDTO.quantidadeExemplares();
-        this.quantidadeDisponivel = livroDTO.quantidadeExemplares();
+        this.quantidadeDisponivel = livroDTO.quantidadeDisponivel() != null ? livroDTO.quantidadeDisponivel() : 0;
         this.genero = livroDTO.genero();
-        this.emprestado = livroDTO.emprestado() != null ? livroDTO.emprestado() : false;
+        this.emprestado = livroDTO.emprestado() != null ? livroDTO.emprestado() : false; 
     }
-
-    public LivroEntity() {
-        this.emprestado = false;
-    }
-
+    
     public LivroEntity(Long id, String titulo, String nomeAutor, Integer anoPublicacao, Integer quantidadeExemplares,
             String genero, Boolean emprestado) {
         this.id = id;
@@ -57,7 +56,8 @@ public class LivroEntity {
         this.nomeAutor = nomeAutor;
         this.anoPublicacao = anoPublicacao;
         this.quantidadeExemplares = quantidadeExemplares;
+        this.quantidadeDisponivel = quantidadeExemplares != null ? quantidadeExemplares : 0;
         this.genero = genero;
-        this.emprestado = false;
+        this.emprestado = emprestado != null ? emprestado : false; 
     }
 }
