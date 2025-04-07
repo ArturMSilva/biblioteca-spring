@@ -57,6 +57,12 @@ public class LivroController {
         return livroService.atualizarLivro(id, livroAtualizado);
     }
 
+    @PostMapping("/{id}/adicionar-exemplar")
+    public ResponseEntity<LivroDTO> adicionarExemplar(@PathVariable Long id, @RequestParam int quantidade) {
+        LivroDTO livro = livroService.adicionarExemplar(id, quantidade);
+        return ResponseEntity.ok(livro);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarLivro(@PathVariable Long id) {
         livroService.deletarLivro(id);
