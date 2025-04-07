@@ -5,11 +5,15 @@ import org.springframework.stereotype.Service;
 
 import br.com.biblioteca.repositories.EmprestimoRepository;
 import br.com.biblioteca.repositories.LivroRepository;
+import br.com.biblioteca.repositories.UsuarioRepository;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import br.com.biblioteca.dto.EmprestimoDTO;
 import br.com.biblioteca.entities.EmprestimoEntity;
 import br.com.biblioteca.entities.LivroEntity;
+import br.com.biblioteca.entities.UsuarioEntity;
 
 @Service
 public class EmprestimoService {
@@ -19,6 +23,9 @@ public class EmprestimoService {
 
     @Autowired
     private LivroRepository livroRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     public List<EmprestimoDTO> buscarTodosEmprestimos() {
         List<EmprestimoEntity> emprestimos = emprestimoRepository.findAll();
@@ -30,18 +37,30 @@ public class EmprestimoService {
     }
 
     public EmprestimoDTO adicionarEmprestimo(EmprestimoDTO emprestimoDTO) {
-        EmprestimoEntity emprestimo = new EmprestimoEntity(emprestimoDTO);
-        LivroEntity livro = emprestimo.getLivro();
+        UsuarioEntity usuario = usuarioRepository.findById(emprestimoDTO.usuario().id())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Usuário com ID " + emprestimoDTO.usuario().id() + " não encontrado")); 
     
-        if (livro.getQuantidadeDisponivel() > 0) {
-            emprestimo.setStatus(EmprestimoEntity.StatusEmprestimo.EM_ANDAMENTO);
-            livro.setQuantidadeDisponivel(livro.getQuantidadeDisponivel() - 1); // Diminui a quantidade disponível
-        } else {
-            emprestimo.setStatus(EmprestimoEntity.StatusEmprestimo.PENDENTE);
+        LivroEntity livro = livroRepository.findById(emprestimoDTO.livro().id()) 
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Livro com ID " + emprestimoDTO.livro().id() + " não encontrado")); 
+    
+        if (livro.getQuantidadeDisponivel() <= 0) {
+            throw new IllegalStateException(
+                    "O livro com ID " + livro.getId() + " não está disponível para empréstimo.");
         }
     
+        EmprestimoEntity emprestimo = new EmprestimoEntity();
+        emprestimo.setUsuario(usuario);
+        emprestimo.setLivro(livro);
+        emprestimo.setStatus(EmprestimoEntity.StatusEmprestimo.EM_ANDAMENTO);
+        emprestimo.setDataEmprestimo(LocalDate.now());
+        emprestimo.setDataDevolucao(LocalDate.now().plusDays(15));
+    
+        livro.setQuantidadeDisponivel(livro.getQuantidadeDisponivel() - 1);
+    
         emprestimo = emprestimoRepository.save(emprestimo);
-        livroRepository.save(livro); 
+        livroRepository.save(livro);
     
         return new EmprestimoDTO(emprestimo);
     }
