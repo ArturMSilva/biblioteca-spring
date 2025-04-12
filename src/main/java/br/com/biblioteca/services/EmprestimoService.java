@@ -38,15 +38,18 @@ public class EmprestimoService {
     public EmprestimoDTO adicionarEmprestimo(EmprestimoDTO emprestimoDTO) {
         UsuarioEntity usuario = usuarioRepository.findById(emprestimoDTO.usuario().id())
                 .orElseThrow(() -> new IllegalArgumentException(
-                        "Usuário com ID " + emprestimoDTO.usuario().id() + " não encontrado")); 
+                        "Usuário com ID " + emprestimoDTO.usuario().id() + " não encontrado"));
     
-        LivroEntity livro = livroRepository.findById(emprestimoDTO.livro().id()) 
+        LivroEntity livro = livroRepository.findById(emprestimoDTO.livro().id())
                 .orElseThrow(() -> new IllegalArgumentException(
-                        "Livro com ID " + emprestimoDTO.livro().id() + " não encontrado")); 
+                        "Livro com ID " + emprestimoDTO.livro().id() + " não encontrado"));
+    
+        if (usuario.getEndereco() == null) {
+            throw new IllegalStateException("O usuário não possui um endereço cadastrado.");
+        }
     
         if (livro.getQuantidadeDisponivel() <= 0) {
-            throw new IllegalStateException(
-                    "O livro com ID " + livro.getId() + " não está disponível para empréstimo.");
+            throw new IllegalStateException("Não há exemplares disponíveis para o livro solicitado.");
         }
     
         EmprestimoEntity emprestimo = new EmprestimoEntity();
@@ -57,11 +60,11 @@ public class EmprestimoService {
         emprestimo.setDataDevolucao(LocalDate.now().plusDays(15));
     
         livro.setQuantidadeDisponivel(livro.getQuantidadeDisponivel() - 1);
-    
-        emprestimo = emprestimoRepository.save(emprestimo);
+        livro.setEmprestado(true);
+        
         livroRepository.save(livro);
     
-        return new EmprestimoDTO(emprestimo);
+        return new EmprestimoDTO(emprestimoRepository.save(emprestimo));
     }
 
     public EmprestimoDTO ativarEmprestimoPendente(Long id) {
