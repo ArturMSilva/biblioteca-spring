@@ -72,14 +72,6 @@ public class LivroService {
         livroRepository.delete(livro);
     }
 
-    public void realizarEmprestimoLivro(Long id) {
-        LivroEntity livro = livroRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Livro não encontrado"));
-
-        livro.setEmprestado(true);
-        livroRepository.save(livro);
-    }
-
     public void devolverLivro(Long id) {
         LivroEntity livro = livroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Livro não encontrado"));
