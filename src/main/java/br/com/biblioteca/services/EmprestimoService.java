@@ -100,7 +100,11 @@ public class EmprestimoService {
     public EmprestimoDTO encerrarEmprestimo(Long id) {
         EmprestimoEntity emprestimo = emprestimoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Empréstimo com ID " + id + " não encontrado"));
+                LivroEntity livro = livroRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Livro não encontrado"));
 
+        livro.setEmprestado(false);
+        livroRepository.save(livro);
         if (emprestimo.getStatus() == EmprestimoEntity.StatusEmprestimo.FINALIZADO) {
             throw new IllegalStateException("O empréstimo já está finalizado.");
         }
