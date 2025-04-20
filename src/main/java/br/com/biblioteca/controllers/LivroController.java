@@ -69,8 +69,4 @@ public class LivroController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/devolver/{id}")
-    public void devolverLivro(@PathVariable Long id) {
-        livroService.devolverLivro(id);
-    }
 }
